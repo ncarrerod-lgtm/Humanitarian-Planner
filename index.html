@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humanitarian Work — Daily Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --coral-mid: #F0997B;
+    --coral-dark: #712B13;
+    --ink: #1a1917;
+    --ink2: #3d3b37;
+    --ink3: #6b6863;
+    --ink4: #9c9a94;
+    --surface: #faf9f7;
+    --surface2: #f3f1ed;
+    --surface3: #eae8e3;
+    --border: rgba(26,25,23,0.1);
+    --border2: rgba(26,25,23,0.18);
+    --success: #1D9E75;
+    --success-bg: #E1F5EE;
+    --radius: 10px;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--ink);
+    color: #fff;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--coral);
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .sidebar-date {
+    border-top: 0.5px solid rgba(255,255,255,0.12);
+    padding-top: 1.5rem;
+  }
+
+  .sidebar-day {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  .sidebar-datestr {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 6px;
+    margin-top: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.55);
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(216,90,48,0.25); color: #fff; }
+
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--coral); flex-shrink: 0; }
+
+  .sidebar-notion {
+    margin-top: auto;
+    border-top: 0.5px solid rgba(255,255,255,0.12);
+    padding-top: 1.25rem;
+  }
+
+  .notion-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .status-indicator {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .status-indicator.connected { background: var(--success); }
+  .status-indicator.error { background: #E24B4A; }
+
+  /* MAIN */
+  .main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    padding: 1.5rem 2.5rem 1rem;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .phase-steps {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .step {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    color: var(--ink4);
+    cursor: pointer;
+    background: none;
+    transition: all 0.15s;
+  }
+
+  .step:hover { border-color: var(--coral); color: var(--coral); }
+  .step.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .step.done { color: var(--success); border-color: rgba(29,158,117,0.3); background: var(--success-bg); }
+
+  .step-sep { color: var(--border2); font-size: 12px; }
+
+  .topbar-actions { display: flex; gap: 8px; }
+
+  .btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-family: var(--font-body);
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--ink2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:hover { background: var(--surface2); border-color: var(--ink4); }
+
+  .btn.primary {
+    background: var(--coral);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .btn.primary:hover { background: var(--coral-dark); }
+
+  /* CONTENT AREA */
+  .content {
+    flex: 1;
+    padding: 2.5rem;
+    max-width: 760px;
+  }
+
+  .phase { display: none; }
+  .phase.visible { display: block; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink4);
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* SETUP PHASE */
+  .token-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .token-input {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--ink);
+    outline: none;
+  }
+
+  .token-input:focus { border-color: var(--coral); }
+
+  .notion-pages {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .notion-page-card {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+
+  .npc-title { font-size: 13px; font-weight: 500; color: var(--ink2); margin-bottom: 3px; }
+  .npc-status { font-size: 11px; color: var(--ink4); }
+  .npc-status.ok { color: var(--success); }
+  .npc-status.err { color: #E24B4A; }
+
+  .hint { font-size: 13px; color: var(--ink3); line-height: 1.6; margin-bottom: 1rem; }
+
+  /* BRAIN DUMP PHASE */
+  .braindump-area {
+    width: 100%;
+    min-height: 240px;
+    padding: 16px;
+    font-size: 15px;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+    line-height: 1.7;
+    outline: none;
+    margin-bottom: 1rem;
+  }
+
+  .braindump-area:focus { border-color: var(--coral); }
+
+  /* CHAT PHASE */
+  .chat-wrap {
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .chat-messages {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 300px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .msg.ai {
+    background: var(--surface2);
+    color: var(--ink);
+    align-self: flex-start;
+    border-bottom-left-radius: 3px;
+  }
+
+  .msg.user {
+    background: var(--ink);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 3px;
+  }
+
+  .msg.loading {
+    background: var(--surface2);
+    color: var(--ink4);
+    align-self: flex-start;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 1.25rem;
+    border-top: 0.5px solid var(--border);
+    background: var(--surface);
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    outline: none;
+    resize: none;
+    min-height: 38px;
+    line-height: 1.5;
+  }
+
+  .chat-input:focus { border-color: var(--coral); }
+
+  .send-btn {
+    width: 38px;
+    height: 38px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+
+  .send-btn:hover { opacity: 0.8; }
+
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    background: #fff;
+    color: var(--ink3);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.15s;
+  }
+
+  .chip:hover { border-color: var(--coral); color: var(--coral); }
+
+  /* TASKS PHASE */
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .task-row:last-of-type { border-bottom: none; }
+
+  .chk {
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid var(--border2);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .chk.done { background: var(--success); border-color: var(--success); }
+  .chk-svg { display: none; }
+  .chk.done .chk-svg { display: block; }
+
+  .t-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: var(--font-body);
+    color: var(--ink);
+    outline: none;
+    min-width: 0;
+  }
+
+  .t-input.done { text-decoration: line-through; color: var(--ink4); }
+  .t-input::placeholder { color: var(--ink4); }
+
+  .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink4);
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .del-btn:hover { color: var(--ink); }
+
+  .add-task-btn {
+    font-size: 13px;
+    color: var(--ink4);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    padding: 8px 0;
+    transition: color 0.15s;
+  }
+
+  .add-task-btn:hover { color: var(--coral); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 1.25rem 0;
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .stat-num { font-size: 24px; font-weight: 500; color: var(--ink); font-family: var(--font-display); }
+  .stat-lbl { font-size: 11px; color: var(--ink4); margin-top: 3px; }
+
+  .prog-wrap { height: 3px; background: var(--surface3); border-radius: 2px; margin-bottom: 1.25rem; }
+  .prog-bar { height: 3px; border-radius: 2px; background: var(--success); transition: width 0.4s ease; }
+
+  .push-btn {
+    width: 100%;
+    padding: 11px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s;
+    margin-top: 0.5rem;
+  }
+
+  .push-btn:hover { opacity: 0.85; }
+  .push-btn.loading { opacity: 0.6; pointer-events: none; }
+
+  .push-status {
+    font-size: 12px;
+    color: var(--ink4);
+    text-align: center;
+    margin-top: 6px;
+    min-height: 16px;
+  }
+
+  .push-status.ok { color: var(--success); }
+  .push-status.err { color: #E24B4A; }
+
+  /* HISTORY */
+  .hist-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 13px;
+  }
+
+  .hist-row:last-child { border-bottom: none; }
+  .hist-date { color: var(--ink3); min-width: 80px; font-family: var(--font-mono); font-size: 12px; }
+  .hist-bar-wrap { flex: 1; height: 5px; background: var(--surface3); border-radius: 3px; }
+  .hist-bar { height: 5px; border-radius: 3px; background: var(--coral); }
+  .hist-pct { font-weight: 500; color: var(--ink); min-width: 34px; text-align: right; font-size: 13px; }
+
+  .notion-icon { width: 14px; height: 14px; flex-shrink: 0; }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; }
+    .content { padding: 1.5rem; }
+    .notion-pages { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-dot"></div>
+      <div class="logo-text">Humanitarian<br>Work</div>
+    </div>
+
+    <div class="sidebar-date">
+      <div class="sidebar-day" id="sb-day"></div>
+      <div class="sidebar-datestr" id="sb-date"></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Planning</div>
+      <button class="nav-item active" onclick="goPhase(0)" id="nav-0">
+        <div class="nav-dot"></div> Setup
+      </button>
+      <button class="nav-item" onclick="goPhase(1)" id="nav-1">
+        <div class="nav-dot"></div> Brain dump
+      </button>
+      <button class="nav-item" onclick="goPhase(2)" id="nav-2">
+        <div class="nav-dot"></div> Plan with AI
+      </button>
+      <button class="nav-item" onclick="goPhase(3)" id="nav-3">
+        <div class="nav-dot"></div> Today's tasks
+      </button>
+
+      <div class="nav-label" style="margin-top: 1rem;">Review</div>
+      <button class="nav-item" onclick="goPhase(4)" id="nav-4">
+        <div class="nav-dot"></div> History
+      </button>
+    </nav>
+
+    <div class="sidebar-notion">
+      <div class="notion-status-pill">
+        <div class="status-indicator" id="status-dot"></div>
+        <span id="status-text">Not connected</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="phase-steps">
+        <button class="step active" id="step-0" onclick="goPhase(0)">1 · Setup</button>
+        <span class="step-sep">›</span>
+        <button class="step" id="step-1" onclick="goPhase(1)">2 · Dump</button>
+        <span class="step-sep">›</span>
+        <button class="step" id="step-2" onclick="goPhase(2)">3 · Plan</button>
+        <span class="step-sep">›</span>
+        <button class="step" id="step-3" onclick="goPhase(3)">4 · Tasks</button>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="goPhase(4)">History</button>
+        <button class="btn primary" onclick="nextPhase()">Continue →</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- PHASE 0: SETUP -->
+      <div class="phase visible" id="phase-0">
+        <div class="section-label" style="margin-bottom:6px">Notion connection</div>
+        <p class="hint">Your Humanitarian Work page is pre-configured. Just add your integration token to connect.</p>
+
+        <div class="card">
+          <div class="section-label">Integration token</div>
+          <div class="token-row">
+            <input class="token-input" type="password" id="notion-token" placeholder="secret_xxxxxxxxxxxxxxxxxxxx" />
+            <button class="btn primary" onclick="connectNotion()">Connect</button>
+          </div>
+          <p style="font-size:12px;color:var(--ink4);line-height:1.5;">
+            Get this from <strong>notion.so/my-integrations</strong>. Stored only in your browser, never sent anywhere except directly to Notion's API.
+          </p>
+        </div>
+
+        <div class="section-label" style="margin-top:1.5rem">Connected pages</div>
+        <div class="notion-pages">
+          <div class="notion-page-card">
+            <div class="npc-title">Humanitarian Work</div>
+            <div class="npc-status" id="pg-hub">Hub page</div>
+          </div>
+          <div class="notion-page-card">
+            <div class="npc-title">Secretariat Daily Logs</div>
+            <div class="npc-status" id="pg-logs">Not connected</div>
+          </div>
+          <div class="notion-page-card">
+            <div class="npc-title">Secretariat Projects</div>
+            <div class="npc-status" id="pg-projects">Not connected</div>
+          </div>
+          <div class="notion-page-card">
+            <div class="npc-title">Secretariat Context</div>
+            <div class="npc-status" id="pg-context">Not connected</div>
+          </div>
+        </div>
+
+        <div id="connect-msg" style="margin-top:1rem;font-size:13px;color:var(--ink4);min-height:18px;"></div>
+
+        <div style="margin-top:1.5rem">
+          <div class="section-label">Workstream context (auto-loaded from Notion, or edit below)</div>
+          <textarea class="braindump-area" id="ws-context" rows="5" style="min-height:120px;" placeholder="What's active in your humanitarian work right now? What's stuck? Who are the key people? What matters most this week?"></textarea>
+        </div>
+
+        <button class="btn primary" onclick="goPhase(1)" style="margin-top:.5rem">Start today's session →</button>
+      </div>
+
+      <!-- PHASE 1: BRAIN DUMP -->
+      <div class="phase" id="phase-1">
+        <div class="section-label">Brain dump</div>
+        <p class="hint">Don't organize — just write. Tasks, worries, ideas, people to contact, things stuck in your head. Get it all out.</p>
+        <textarea class="braindump-area" id="braindump" placeholder="Everything on my mind...&#10;&#10;Things I need to do today...&#10;What I'm worried about...&#10;Ideas...&#10;People I need to get back to...&#10;Things that felt unfinished from yesterday..."></textarea>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="goPhase(0)">← Back</button>
+          <button class="btn primary" onclick="startSession()">Start planning session →</button>
+        </div>
+      </div>
+
+      <!-- PHASE 2: CHAT -->
+      <div class="phase" id="phase-2">
+        <div class="section-label" style="margin-bottom:8px">Planning session</div>
+        <div class="quick-chips">
+          <button class="chip" onclick="quickSend('What should I focus on first today?')">What to focus on first?</button>
+          <button class="chip" onclick="quickSend('What am I avoiding or neglecting?')">What am I avoiding?</button>
+          <button class="chip" onclick="quickSend('Turn my brain dump into a prioritized task list.')">Make me a task list</button>
+          <button class="chip" onclick="quickSend('Ask me a clarifying question to sharpen my plan.')">Ask me a question</button>
+          <button class="chip" onclick="quickSend('What would a really good day look like given everything I wrote?')">What does a good day look like?</button>
+        </div>
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chat-input" rows="1" placeholder="Reply..." onkeydown="chatKey(event)"></textarea>
+            <button class="send-btn" onclick="sendChat()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 7h12M7 1l6 6-6 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" onclick="goPhase(1)">← Edit dump</button>
+          <button class="btn primary" onclick="goPhase(3)">Lock in tasks →</button>
+        </div>
+      </div>
+
+      <!-- PHASE 3: TASKS -->
+      <div class="phase" id="phase-3">
+        <div class="section-label">Today's tasks</div>
+        <div class="card" id="task-list"></div>
+        <button class="add-task-btn" onclick="addTask()">+ add task</button>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">tasks</div></div>
+          <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">completed</div></div>
+          <div class="stat-card"><div class="stat-num" id="s-pct">0%</div><div class="stat-lbl">done</div></div>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+
+        <button class="push-btn" id="push-btn" onclick="pushToNotion()">
+          <svg class="notion-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933z"/>
+          </svg>
+          Push today's log to Notion
+        </button>
+        <div class="push-status" id="push-status"></div>
+      </div>
+
+      <!-- PHASE 4: HISTORY -->
+      <div class="phase" id="phase-4">
+        <div class="section-label">Completion history</div>
+        <div class="card" id="hist-list">
+          <p style="font-size:14px;color:var(--ink4);padding:.5rem 0;">No history yet. Complete your first day to see progress here.</p>
+        </div>
+        <div style="margin-top:1.25rem">
+          <button class="btn primary" onclick="analyzeWeek()" style="width:100%">Analyze my week with AI →</button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────
+const HUB_PAGE_ID = '2f460323f24b80d182a1dc9d2a7483eb';
+const CHILD_PAGES = {
+  logs:     'Secretariat Daily Logs',
+  projects: 'Secretariat Projects',
+  context:  'Secretariat Context',
+};
+const NOTION_API = 'https://api.notion.com/v1';
+const NOTION_VERSION = '2022-06-28';
+const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
+
+// ─── STATE ─────────────────────────────────────────────────
+let tasks = [];
+let chatHistory = [];
+let childPageIds = {};
+let currentPhase = 0;
+
+function todayKey() { return new Date().toISOString().slice(0, 10); }
+
+function save() {
+  try {
+    localStorage.setItem('hw_tasks_' + todayKey(), JSON.stringify(tasks));
+    localStorage.setItem('hw_dump', document.getElementById('braindump').value);
+    localStorage.setItem('hw_wsctx', document.getElementById('ws-context').value);
+    const tok = document.getElementById('notion-token').value;
+    if (tok) localStorage.setItem('hw_token', tok);
+  } catch(e) {}
+}
+
+function loadSaved() {
+  try {
+    const t = localStorage.getItem('hw_tasks_' + todayKey()); if (t) tasks = JSON.parse(t);
+    const d = localStorage.getItem('hw_dump'); if (d) document.getElementById('braindump').value = d;
+    const c = localStorage.getItem('hw_wsctx'); if (c) document.getElementById('ws-context').value = c;
+    const tok = localStorage.getItem('hw_token'); if (tok) document.getElementById('notion-token').value = tok;
+  } catch(e) {}
+}
+
+// ─── DATE ──────────────────────────────────────────────────
+function renderDate() {
+  const n = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('sb-day').textContent = days[n.getDay()];
+  document.getElementById('sb-date').textContent = months[n.getMonth()] + ' ' + n.getDate() + ', ' + n.getFullYear();
+}
+
+// ─── PHASE NAV ─────────────────────────────────────────────
+function goPhase(n) {
+  save();
+  currentPhase = n;
+  document.querySelectorAll('.phase').forEach((p, i) => p.classList.toggle('visible', i === n));
+  document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.toggle('active', i === n);
+    s.classList.toggle('done', i < n && i < 4);
+  });
+  if (n === 3) renderTasks();
+  if (n === 4) renderHistory();
+}
+
+function nextPhase() { if (currentPhase < 4) goPhase(currentPhase + 1); }
+
+// ─── NOTION CONNECTION ──────────────────────────────────────
+function getToken() { return document.getElementById('notion-token').value.trim(); }
+
+function setStatus(connected, msg) {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  dot.className = 'status-indicator ' + (connected === true ? 'connected' : connected === false ? 'error' : '');
+  txt.textContent = msg;
+}
+
+async function notionFetch(path, method = 'GET', body = null) {
+  const token = getToken();
+  const opts = {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Notion-Version': NOTION_VERSION,
+      'Content-Type': 'application/json',
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(NOTION_API + path, opts);
+  return res.json();
+}
+
+async function connectNotion() {
+  const token = getToken();
+  if (!token) { showConnectMsg('Paste your token first.', false); return; }
+  showConnectMsg('Connecting...', null);
+  setStatus(null, 'Connecting...');
+
+  try {
+    // Verify token works by fetching the hub page
+    const hub = await notionFetch('/pages/' + HUB_PAGE_ID);
+    if (hub.object === 'error') throw new Error(hub.message);
+
+    document.getElementById('pg-hub').textContent = 'Connected';
+    document.getElementById('pg-hub').className = 'npc-status ok';
+
+    // Find child pages
+    const children = await notionFetch('/blocks/' + HUB_PAGE_ID + '/children');
+    if (children.results) {
+      for (const block of children.results) {
+        if (block.type === 'child_page') {
+          const title = block.child_page.title;
+          if (title.includes('Daily Logs') || title.includes('Daily Log')) {
+            childPageIds.logs = block.id;
+            document.getElementById('pg-logs').textContent = 'Connected';
+            document.getElementById('pg-logs').className = 'npc-status ok';
+          }
+          if (title.includes('Projects')) {
+            childPageIds.projects = block.id;
+            document.getElementById('pg-projects').textContent = 'Connected';
+            document.getElementById('pg-projects').className = 'npc-status ok';
+          }
+          if (title.includes('Context')) {
+            childPageIds.context = block.id;
+            document.getElementById('pg-context').textContent = 'Connected';
+            document.getElementById('pg-context').className = 'npc-status ok';
+          }
+        }
+      }
+    }
+
+    // Try to load context from the Context page
+    if (childPageIds.context) {
+      const ctxBlocks = await notionFetch('/blocks/' + childPageIds.context + '/children');
+      const ctxText = ctxBlocks.results
+        ?.filter(b => b.type === 'paragraph')
+        .map(b => b.paragraph?.rich_text?.map(t => t.plain_text).join(''))
+        .filter(Boolean)
+        .join('\n') || '';
+      if (ctxText && !document.getElementById('ws-context').value) {
+        document.getElementById('ws-context').value = ctxText;
+      }
+    }
+
+    setStatus(true, 'Connected to Notion');
+    showConnectMsg('Connected! Context loaded from your pages.', true);
+    localStorage.setItem('hw_child_ids', JSON.stringify(childPageIds));
+    save();
+
+  } catch(e) {
+    setStatus(false, 'Connection failed');
+    showConnectMsg('Could not connect: ' + e.message, false);
+  }
+}
+
+function showConnectMsg(msg, ok) {
+  const el = document.getElementById('connect-msg');
+  el.textContent = msg;
+  el.style.color = ok === true ? 'var(--success)' : ok === false ? '#E24B4A' : 'var(--ink4)';
+}
+
+// ─── AI SESSION ────────────────────────────────────────────
+function buildSystem() {
+  const ctx = document.getElementById('ws-context').value || 'No context provided.';
+  return `You are a sharp, direct daily planning coach for Nicolas's humanitarian work.
+
+Context about this workstream:
+${ctx}
+
+Your role in this session:
+- Read Nicolas's brain dump and identify what actually matters vs. what's noise
+- Suggest what to focus on today, grounded in the context above
+- Flag anything being avoided or that's been stuck too long
+- Ask one sharp clarifying question at a time when thinking is vague
+- Help convert the brain dump into a concrete prioritized task list when asked
+
+Be conversational, direct, and brief. No walls of bullets. Reference specific things from the context. If something from the dump connects to a known sticking point, name it.`;
+}
+
+async function startSession() {
+  const dump = document.getElementById('braindump').value.trim();
+  if (!dump) { alert('Write something in your brain dump first.'); return; }
+  goPhase(2);
+  chatHistory = [];
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = '';
+  addMsg('loading', 'Reading your brain dump...');
+
+  const userMsg = `Here's my brain dump for today:\n\n${dump}\n\nLook at what I've written, consider my workstream context, and start our planning session. Ask me the one most important question first, or immediately tell me the thing you notice that I should pay attention to.`;
+  chatHistory.push({ role: 'user', content: userMsg });
+  const reply = await callClaude();
+  msgs.innerHTML = '';
+  addMsg('ai', reply);
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+  addMsg('loading', '...');
+  const reply = await callClaude();
+  removeLast();
+  addMsg('ai', reply);
+}
+
+function quickSend(msg) {
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+function chatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+async function callClaude() {
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: buildSystem(),
+        messages: chatHistory,
+      }),
+    });
+    const data = await res.json();
+    const text = data.content?.filter(b => b.type === 'text').map(b => b.text).join('') || 'Something went wrong.';
+    chatHistory.push({ role: 'assistant', content: text });
+    return text;
+  } catch(e) { return 'Could not reach Claude — check your connection.'; }
+}
+
+function addMsg(type, text) {
+  const wrap = document.getElementById('chat-messages');
+  const el = document.createElement('div');
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  wrap.appendChild(el);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function removeLast() {
+  const wrap = document.getElementById('chat-messages');
+  if (wrap.lastChild) wrap.removeChild(wrap.lastChild);
+}
+
+// ─── TASKS ─────────────────────────────────────────────────
+function addTask(text = '', done = false) {
+  tasks.push({ id: Date.now() + Math.random(), text, done });
+  renderTasks(); save();
+  setTimeout(() => {
+    const ins = document.querySelectorAll('.t-input');
+    if (ins.length) ins[ins.length - 1].focus();
+  }, 40);
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = '';
+  if (!tasks.length) {
+    list.innerHTML = '<p style="font-size:14px;color:var(--ink4);padding:.5rem 0;">No tasks yet — add some or let AI suggest them.</p>';
+    updateStats(); return;
+  }
+  tasks.forEach((t, i) => {
+    const row = document.createElement('div'); row.className = 'task-row';
+    const chk = document.createElement('div'); chk.className = 'chk' + (t.done ? ' done' : '');
+    chk.innerHTML = '<svg class="chk-svg" width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    chk.onclick = () => { tasks[i].done = !tasks[i].done; renderTasks(); save(); };
+    const inp = document.createElement('input'); inp.type = 'text';
+    inp.className = 't-input' + (t.done ? ' done' : '');
+    inp.value = t.text; inp.placeholder = 'Task...';
+    inp.oninput = e => { tasks[i].text = e.target.value; save(); };
+    inp.onkeydown = e => {
+      if (e.key === 'Enter') addTask();
+      if (e.key === 'Backspace' && !tasks[i].text) { tasks.splice(i, 1); renderTasks(); save(); }
+    };
+    const del = document.createElement('button'); del.className = 'del-btn';
+    del.innerHTML = '&times;';
+    del.onclick = () => { tasks.splice(i, 1); renderTasks(); save(); };
+    row.appendChild(chk); row.appendChild(inp); row.appendChild(del);
+    list.appendChild(row);
+  });
+  updateStats();
+}
+
+function updateStats() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.done).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('prog-bar').style.width = pct + '%';
+}
+
+// ─── PUSH TO NOTION ────────────────────────────────────────
+async function pushToNotion() {
+  const token = getToken();
+  if (!token) { showPushStatus('Connect to Notion first (Setup tab).', false); return; }
+
+  const btn = document.getElementById('push-btn');
+  btn.classList.add('loading');
+  btn.textContent = 'Pushing to Notion...';
+  showPushStatus('', null);
+
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const displayDate = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  const done = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+  const intent = document.getElementById('ws-context').value.slice(0, 120);
+  const sessionNotes = chatHistory.filter(m => m.role === 'assistant').map(m => m.content).join('\n\n');
+
+  // Build rich_text blocks for tasks
+  const taskBlocks = tasks.map(t => ({
+    object: 'block',
+    type: 'to_do',
+    to_do: {
+      rich_text: [{ type: 'text', text: { content: t.text || '(untitled)' } }],
+      checked: t.done,
+    },
+  }));
+
+  const pageBody = {
+    parent: { page_id: childPageIds.logs || HUB_PAGE_ID },
+    properties: {
+      title: {
+        title: [{ type: 'text', text: { content: 'Daily Log — ' + displayDate } }],
+      },
+    },
+    children: [
+      { object: 'block', type: 'heading_2', heading_2: { rich_text: [{ type: 'text', text: { content: displayDate } }] } },
+      { object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: 'Progress: ' + done + '/' + total + ' tasks completed' } }] } },
+      { object: 'block', type: 'divider', divider: {} },
+      { object: 'block', type: 'heading_3', heading_3: { rich_text: [{ type: 'text', text: { content: 'Tasks' } }] } },
+      ...taskBlocks,
+    ],
+  };
+
+  if (sessionNotes) {
+    pageBody.children.push(
+      { object: 'block', type: 'divider', divider: {} },
+      { object: 'block', type: 'heading_3', heading_3: { rich_text: [{ type: 'text', text: { content: 'Planning session notes' } }] } },
+      { object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: sessionNotes.slice(0, 2000) } }] } },
+    );
+  }
+
+  try {
+    const result = await notionFetch('/pages', 'POST', pageBody);
+    if (result.object === 'error') throw new Error(result.message);
+
+    // Save to local history
+    saveHistory({ date: dateStr, total, done, pct: total ? Math.round(done/total*100) : 0 });
+
+    btn.classList.remove('loading');
+    btn.innerHTML = `<svg class="notion-icon" viewBox="0 0 24 24" fill="white"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933z"/></svg> Push today's log to Notion`;
+    showPushStatus('Logged to Notion successfully', true);
+
+  } catch(e) {
+    btn.classList.remove('loading');
+    btn.innerHTML = `<svg class="notion-icon" viewBox="0 0 24 24" fill="white"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933z"/></svg> Push today's log to Notion`;
+    showPushStatus('Error: ' + e.message + ' — check that pages are shared with your integration.', false);
+  }
+}
+
+function showPushStatus(msg, ok) {
+  const el = document.getElementById('push-status');
+  el.textContent = msg;
+  el.className = 'push-status' + (ok === true ? ' ok' : ok === false ? ' err' : '');
+}
+
+// ─── HISTORY ───────────────────────────────────────────────
+function saveHistory(entry) {
+  try {
+    let h = JSON.parse(localStorage.getItem('hw_history') || '[]');
+    const idx = h.findIndex(x => x.date === entry.date);
+    if (idx >= 0) h[idx] = entry; else h.push(entry);
+    h = h.slice(-30);
+    localStorage.setItem('hw_history', JSON.stringify(h));
+  } catch(e) {}
+}
+
+function renderHistory() {
+  const list = document.getElementById('hist-list');
+  try {
+    const h = JSON.parse(localStorage.getItem('hw_history') || '[]').reverse().slice(0, 14);
+    if (!h.length) { list.innerHTML = '<p style="font-size:14px;color:var(--ink4);padding:.5rem 0;">No history yet.</p>'; return; }
+    list.innerHTML = h.map(entry => `
+      <div class="hist-row">
+        <span class="hist-date">${entry.date}</span>
+        <div class="hist-bar-wrap"><div class="hist-bar" style="width:${entry.pct}%"></div></div>
+        <span class="hist-pct">${entry.pct}%</span>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+async function analyzeWeek() {
+  try {
+    const h = JSON.parse(localStorage.getItem('hw_history') || '[]').slice(-7);
+    const summary = h.map(e => `${e.date}: ${e.done}/${e.total} tasks (${e.pct}%)`).join('\n');
+    const ctx = document.getElementById('ws-context').value;
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        messages: [{
+          role: 'user',
+          content: `Here's my past week of work on Humanitarian Work:\n\n${summary}\n\nWorkstream context: ${ctx}\n\nGive me a brief, honest analysis of my patterns this week. What's working? What am I avoiding? One concrete thing to do differently next week.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.filter(b => b.type === 'text').map(b => b.text).join('') || '';
+    if (text) {
+      const el = document.createElement('div');
+      el.style.cssText = 'margin-top:1rem;padding:1rem 1.25rem;background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);font-size:14px;line-height:1.7;color:var(--ink2);';
+      el.textContent = text;
+      document.getElementById('phase-4').appendChild(el);
+    }
+  } catch(e) {}
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+renderDate();
+loadSaved();
+renderTasks();
+try {
+  const saved = localStorage.getItem('hw_child_ids');
+  if (saved) {
+    childPageIds = JSON.parse(saved);
+    const tok = localStorage.getItem('hw_token');
+    if (tok) {
+      setStatus(true, 'Connected to Notion');
+      if (childPageIds.logs) { document.getElementById('pg-logs').textContent = 'Connected'; document.getElementById('pg-logs').className = 'npc-status ok'; }
+      if (childPageIds.projects) { document.getElementById('pg-projects').textContent = 'Connected'; document.getElementById('pg-projects').className = 'npc-status ok'; }
+      if (childPageIds.context) { document.getElementById('pg-context').textContent = 'Connected'; document.getElementById('pg-context').className = 'npc-status ok'; }
+      document.getElementById('pg-hub').textContent = 'Connected'; document.getElementById('pg-hub').className = 'npc-status ok';
+    }
+  }
+} catch(e) {}
+</script>
+</body>
+</html>
